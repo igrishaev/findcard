@@ -1,6 +1,9 @@
 (ns findcard.core
   (:gen-class)
   (:require
+
+   [etaoin.api :as e]
+
    [clj-http.client :as client]
    [hickory.core :as h]
    [hickory.select :as s]
@@ -13,6 +16,9 @@
   (:body
    (client/get "https://www.e-katalog.ru/ek-list.php"
                {:query-params {"search_" "rtx 3060"}})))
+
+
+
 
 #_
 (def parsed-doc
@@ -37,6 +43,74 @@
 #_
 (def range-node
   (s/select (s/class "model-price-range") (first nodes)))
+
+
+
+(defn foo []
+  (e/with-chrome {
+                  :args ["--headless"
+                         "--disable-gpu"
+                         "--window-size=1920x1080"
+                         "--enable-javascript"
+                         "--user-agent=Mozilla: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101"
+
+                         ]} driver
+
+
+    (e/go driver "https://www.computeruniverse.net/ru/c/apparatnoe-obespechenie-i-komponenty/videokarty-nvidia?range%5Bprice_ag_floored%5D%5Bmin%5D=254&toggle%5Bdeliverydatenow%5D=true")
+
+    (e/wait 3)
+
+    (let [html (e/get-source driver)
+
+          parsed-doc
+          (h/parse html)
+
+          doc-tree
+          (h/as-hickory parsed-doc)
+
+          nodes
+          (s/select (s/class "ais-Hits-item") doc-tree)
+
+          _
+          (def -nodes nodes)
+
+          titles
+          (for [node nodes]
+            (some-> (s/select (s/class "c-productItem__head__name") node)
+                    first
+                    :content
+                    first))
+
+          prices
+          (for [node nodes]
+            (some-> (s/select (s/class "price--grey-alt") node)
+                       first
+                       :content
+                       first
+                       :content
+                       first))
+
+          hrefs
+          (for [node nodes]
+            (some-> (s/select (s/class "c-productItem__head__name") node)
+                  first
+                  :attrs
+                  :href
+                  ))
+          ]
+
+
+      [titles prices hrefs]
+      )
+    )
+  )
+
+;; ais-Hits-item
+;; c-productItem__head__name
+;; price price--blue-4xl flex
+;; price price--grey-alt flex
+
 
 
 (defn show-prices [query]
