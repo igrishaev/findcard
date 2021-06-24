@@ -45,12 +45,16 @@
   (s/select (s/class "model-price-range") (first nodes)))
 
 
+(defn parse-price [line]
+  (-> line
+      (str/replace #"[^0-9]" "")
+      Integer/parseInt))
 
-(defn foo []
-  (e/with-chrome {
+
+(defn parse-cu []
+  (e/with-chrome {:size [1920 1080]
                   :args ["--headless"
                          "--disable-gpu"
-                         "--window-size=1920x1080"
                          "--enable-javascript"
                          "--user-agent=Mozilla: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101"
 
@@ -59,16 +63,11 @@
 
     (e/go driver "https://www.computeruniverse.net/ru/c/apparatnoe-obespechenie-i-komponenty/videokarty-nvidia?range%5Bprice_ag_floored%5D%5Bmin%5D=254&toggle%5Bdeliverydatenow%5D=true")
 
-    (e/wait 3)
+    (e/wait 1)
 
-    (e/scroll-down driver 500)
-    (e/wait 0.3)
-
-    (e/scroll-down driver 500)
-    (e/wait 0.3)
-
-    (e/scroll-down driver 500)
-    (e/wait 0.3)
+    (dotimes [_ 5]
+      (e/scroll-down driver 500)
+      (e/wait 0.1))
 
     (let [html (e/get-source driver)
 
@@ -109,14 +108,15 @@
                     first
                     :attrs
                     :href
-                    ))
-          ]
+                    ))]
 
+      (for [[title price href] (map vector titles prices hrefs)]
 
-      [titles prices hrefs]
-      )
-    )
-  )
+        {:title title
+         :min-price (parse-price price)
+         :max-price ""
+         :url (str "https://www.computeruniverse.net" href)}))))
+
 
 ;; ais-Hits-item
 ;; c-productItem__head__name
@@ -162,13 +162,11 @@
 
                 min-price
                 (some-> range-node first :content second :content (nth 0) :content first
-                        (str/replace #"[^0-9]" "")
-                        Integer/parseInt)
+                        parse-price)
 
                 max-price
                 (some-> range-node first :content second :content (nth 2) :content first
-                        (str/replace #"[^0-9]" "")
-                        Integer/parseInt)]
+                        parse-price)]
 
             {:title title
              :url url
@@ -195,7 +193,9 @@
 (defn -main
   [& args]
 
-  (let [queries ["rtx 3060" "rtx 2060" "gtx 1660 super"]
+  (let [cu-result (future (parse-cu))
+
+        queries ["rtx 3060" "rtx 2060" "gtx 1660 super"]
 
         renders
         (doall
@@ -208,6 +208,15 @@
       (println)
       (println query)
       (println "-------------------")
-      (println render)))
+      (println render)
+
+      )
+
+    (println)
+    (println "Computer Universe")
+    (println "-------------------")
+    (println (render @cu-result))
+
+)
 
   (System/exit 0))
