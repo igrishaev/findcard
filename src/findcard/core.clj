@@ -61,7 +61,19 @@
 
     (e/wait 3)
 
+    (e/scroll-down driver 500)
+    (e/wait 0.3)
+
+    (e/scroll-down driver 500)
+    (e/wait 0.3)
+
+    (e/scroll-down driver 500)
+    (e/wait 0.3)
+
     (let [html (e/get-source driver)
+
+          _
+          (spit "cu.html" html)
 
           parsed-doc
           (h/parse html)
@@ -85,19 +97,19 @@
           prices
           (for [node nodes]
             (some-> (s/select (s/class "price--grey-alt") node)
-                       first
-                       :content
-                       first
-                       :content
-                       first))
+                    first
+                    :content
+                    first
+                    :content
+                    first))
 
           hrefs
           (for [node nodes]
             (some-> (s/select (s/class "c-productItem__head__name") node)
-                  first
-                  :attrs
-                  :href
-                  ))
+                    first
+                    :attrs
+                    :href
+                    ))
           ]
 
 
@@ -113,7 +125,7 @@
 
 
 
-(defn show-prices [query]
+(defn get-prices [query]
 
   (let [document
         (:body
@@ -180,24 +192,22 @@
       (println min-price " -- " max-price))))
 
 
-(defn to-file [data]
-
-  (let [html (render data)
-        file (java.io.File/createTempFile "vcards" ".html")
-        path (str file)]
-
-    (spit path html)
-    path))
-
-
 (defn -main
   [& args]
 
-  (let [queries ["rtx 3060" "rtx 2060" "gtx 1660 super"]]
+  (let [queries ["rtx 3060" "rtx 2060" "gtx 1660 super"]
 
-    (doseq [query queries]
+        renders
+        (doall
+         (pmap (fn [query]
+                 (render (get-prices query)))
+               queries))]
+
+    (doseq [[query render] (map vector queries renders)]
 
       (println)
       (println query)
       (println "-------------------")
-      (println (render (show-prices query))))))
+      (println render)))
+
+  (System/exit 0))
