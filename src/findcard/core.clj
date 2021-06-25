@@ -4,6 +4,8 @@
 
    [etaoin.api :as e]
 
+   [cheshire.core :as json]
+
    [clj-http.client :as client]
    [hickory.core :as h]
    [hickory.select :as s]
@@ -114,7 +116,6 @@
 
         {:title title
          :min-price (parse-price price)
-         :max-price ""
          :url (str "https://www.computeruniverse.net" href)}))))
 
 
@@ -125,7 +126,7 @@
 
 
 
-(defn get-prices [query]
+(defn parse-e-katalog [query]
 
   (let [document
         (:body
@@ -178,6 +179,54 @@
          (sort-by :min-price))))
 
 
+
+(defn parse-abc [query]
+
+  (let [html
+        (:body
+         (client/get "https://voronezh.abc.ru/search/"
+                     {:query-params {"query" query}}))
+
+        _
+        (spit "abc.html" html)
+
+        parsed-doc
+        (h/parse html)
+
+        doc-tree
+        (h/as-hickory parsed-doc)
+
+        nodes
+        (s/select (s/class "product-tile") doc-tree)
+
+        _
+        (def -abc-nodes nodes)]
+
+    (for [node nodes]
+
+      (let [a
+            (-> (s/select (s/class "product-tile__title") node)
+                first)
+
+            title
+            (-> a :attrs :title)
+
+            url
+            (str "https://voronezh.abc.ru"
+                 (-> a :attrs :href))
+
+            price
+            (-> (s/select (s/class "product__price-current") node)
+                   first
+                   :content
+                   first
+                   parse-price)]
+
+        {:title title
+         :url url
+         :min-price price}))))
+
+
 (defn render [data]
 
   (with-out-str
@@ -187,32 +236,42 @@
       (println)
       (println title)
       (println url)
-      (println min-price " -- " max-price))))
+      (print min-price)
+
+      (when max-price
+        (print " -- " max-price))
+
+      (println))))
+
+
+(defn present [title rows]
+  (println)
+  (println title)
+  (println "-------------------")
+  (println (render rows)))
+
 
 
 (defn -main
   [& args]
 
-  (let [cu-result (future (parse-cu))
+  (let [fut1 (future (parse-abc "rtx 3060"))
+        fut2 (future (parse-abc "rtx 2060 super"))
+        fut3 (future (parse-e-katalog "rtx 3060"))
+        fut4 (future (parse-e-katalog "rtx 2060 super"))
+        fut5 (future (parse-e-katalog "gtx 1660 super"))
+        fut6 (future (parse-cu))]
 
-        queries ["rtx 3060" "rtx 2060" "gtx 1660 super"]
+    (present "ABC RTX 3060" @fut1)
 
-        renders
-        (doall
-         (pmap (fn [query]
-                 (render (get-prices query)))
-               queries))]
+    (present "ABC RTX 2060 Super" @fut2)
 
-    (doseq [[query render] (map vector queries renders)]
+    (present "E-Katalog RTX 3060" @fut3)
 
-      (println)
-      (println query)
-      (println "-------------------")
-      (println render))
+    (present "E-Katalog RTX 2060 Super" @fut4)
 
-    (println)
-    (println "Computer Universe")
-    (println "-------------------")
-    (println (render @cu-result)))
+    (present "E-Katalog GTX 1660 Super" @fut5)
+
+    (present "Computer Universe" @fut6))
 
   (System/exit 0))
