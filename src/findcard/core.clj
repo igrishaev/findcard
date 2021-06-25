@@ -46,9 +46,9 @@
 
 
 (defn parse-price [line]
-  (-> line
-      (str/replace #"[^0-9]" "")
-      Integer/parseInt))
+  (some-> line
+          (str/replace #"[^0-9]" "")
+          Integer/parseInt))
 
 
 (defn parse-cu []
@@ -65,7 +65,7 @@
 
     (e/wait 1)
 
-    (dotimes [_ 5]
+    (dotimes [_ 20]
       (e/scroll-down driver 500)
       (e/wait 0.1))
 
@@ -208,15 +208,11 @@
       (println)
       (println query)
       (println "-------------------")
-      (println render)
-
-      )
+      (println render))
 
     (println)
     (println "Computer Universe")
     (println "-------------------")
-    (println (render @cu-result))
-
-)
+    (println (render @cu-result)))
 
   (System/exit 0))
