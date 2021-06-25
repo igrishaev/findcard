@@ -54,14 +54,14 @@
 
 
 (defn parse-cu []
-  (e/with-chrome {:size [1920 1080]
-                  :args ["--headless"
-                         "--disable-gpu"
-                         "--enable-javascript"
-                         "--user-agent=Mozilla: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101"
 
-                         ]} driver
+  (e/with-chrome
 
+    {:size [1920 1080]
+     :headless true
+     :user-agent "Mozilla: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101"}
+
+    driver
 
     (e/go driver "https://www.computeruniverse.net/ru/c/apparatnoe-obespechenie-i-komponenty/videokarty-nvidia?range%5Bprice_ag_floored%5D%5Bmin%5D=254&toggle%5Bdeliverydatenow%5D=true")
 

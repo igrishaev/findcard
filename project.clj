@@ -12,7 +12,7 @@
                  [hickory "0.7.1"]
                  [clj-http "3.12.2"]
 
-                 [etaoin "0.4.1"]
+                 [etaoin "0.4.3"]
 
                  ]
 
