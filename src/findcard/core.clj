@@ -236,7 +236,10 @@
 
     driver
 
-    (e/go driver "https://www.onlinetrade.ru/sitesearch.html?query=rtx+3060&cat_id=338&archive=0&force_items=1")
+    (e/go driver
+          (format
+           "https://www.onlinetrade.ru/sitesearch.html?query=%s&cat_id=338&archive=0&force_items=1"
+           query))
 
     (e/wait 3)
 
@@ -327,8 +330,8 @@
 
         fut60 (future (parse-cu))
 
-        fut70 (future (parse-online-trade "rtx 3060"))
-        fut75 (future (parse-online-trade "rtx 2060 super"))]
+        fut70 (future (parse-online-trade "rtx+3060"))
+        fut75 (future (parse-online-trade "rtx+2060+super"))]
 
     (present "ABC RTX 3060" @fut10)
 
