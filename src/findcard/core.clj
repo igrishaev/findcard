@@ -126,12 +126,11 @@
 
 
 
-(defn parse-e-katalog [query]
+(defn parse-e-katalog [url]
 
   (let [document
         (:body
-         (client/get "https://www.e-katalog.ru/ek-list.php"
-                     {:query-params {"search_" query}}))
+         (client/get url))
 
         parsed-doc
         (h/parse document)
@@ -322,8 +321,8 @@
         fut20 (future (parse-abc "rtx 2060 super"))
         ;; fut21 (future (parse-abc "gtx 1660 super"))
 
-        fut30 (future (parse-e-katalog "rtx 3060"))
-        fut40 (future (parse-e-katalog "rtx 2060 super"))
+        fut30 (future (parse-e-katalog "https://www.e-katalog.ru/ek-list.php?katalog_=189&presets_=43493&brands_=50,240,3902&order_=price"))
+        fut40 (future (parse-e-katalog "https://www.e-katalog.ru/ek-list.php?katalog_=189&presets_=35663,37775&brands_=50,240,3902&order_=price"))
         ;; fut50 (future (parse-e-katalog "gtx 1660 super"))
 
         fut60 (future (parse-cu))
@@ -339,7 +338,7 @@
 
     (present "E-Katalog RTX 3060" @fut30)
 
-    (present "E-Katalog RTX 2060 Super" @fut40)
+    (present "E-Katalog RTX 2060 (Super)" @fut40)
 
     (present "OnlineTrade RTX 3060" @fut70)
     (present "OnlineTrade RTX 2060 Super" @fut75)
