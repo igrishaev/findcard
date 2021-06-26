@@ -63,7 +63,7 @@
 
     driver
 
-    (e/go driver "https://www.computeruniverse.net/ru/c/apparatnoe-obespechenie-i-komponenty/videokarty-nvidia?range%5Bprice_ag_floored%5D%5Bmin%5D=254&toggle%5Bdeliverydatenow%5D=true")
+    (e/go driver "https://www.computeruniverse.net/ru/c/apparatnoe-obespechenie-i-komponenty/videokarty-pci-express?refinementList%5Bfacets.Chipsatz.values%5D%5B0%5D=NVIDIA%C2%AE%20GeForce%20RTX%E2%84%A2%203060&refinementList%5Bfacets.Chipsatz.values%5D%5B1%5D=NVIDIA%C2%AE%20GeForce%20RTX%E2%84%A2%202060&refinementList%5Bfacets.Chipsatz.values%5D%5B2%5D=NVIDIA%C2%AE%20GeForce%20RTX%E2%84%A2%203070&refinementList%5Bfacets.Chipsatz.values%5D%5B3%5D=NVIDIA%C2%AE%20GeForce%20RTX%E2%84%A2%203070%20Ti&range%5Bprice_ag_floored%5D%5Bmin%5D=431&toggle%5Bdeliverydatenow%5D=true&sortBy=Prod-ComputerUniverse_ru_price_asc")
 
     (e/wait 1)
 
