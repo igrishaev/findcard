@@ -175,8 +175,7 @@
              :max-price max-price}))]
 
     (->> report
-         (filter (every-pred :min-price :max-price))
-         (sort-by :min-price))))
+         (filter (every-pred :min-price :max-price)))))
 
 
 
@@ -227,6 +226,70 @@
          :min-price price}))))
 
 
+(defn parse-online-trade [query]
+
+  (e/with-chrome
+
+    {:size [1920 1080]
+     ;; :headless true
+     ;; :user-agent "Mozilla: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101"
+     }
+
+    driver
+
+    (e/go driver "https://www.onlinetrade.ru/sitesearch.html?query=rtx+3060&cat_id=338&archive=0&force_items=1")
+
+    (e/wait 3)
+
+    (let [html (e/get-source driver)
+
+          _
+          (spit "online-trade.html" html)
+
+          parsed-doc
+          (h/parse html)
+
+          doc-tree
+          (h/as-hickory parsed-doc)
+
+          nodes
+          (s/select (s/class "indexGoods__item") doc-tree)
+
+          _
+          (def -ot-nodes nodes)]
+
+      (for [node nodes]
+
+        (let [title
+              (some-> (s/select (s/class "indexGoods__item__name") node)
+                      first
+                      :attrs
+                      :title)
+
+              url
+              (str "https://www.onlinetrade.ru"
+                   (some-> (s/select (s/class "indexGoods__item__name") node)
+                           first
+                           :attrs
+                           :href))
+
+              price
+              (some-> (s/select (s/class "indexGoods__item__price") node)
+                      first
+                      :content
+                      second
+                      :content
+                      first
+                      parse-price)]
+
+          {:title title
+           :min-price price
+           :url url})))))
+
+
+
+
+
 (defn render [data]
 
   (with-out-str
@@ -248,30 +311,41 @@
   (println)
   (println title)
   (println "-------------------")
-  (println (render rows)))
+  (println (render (sort-by :min-price rows))))
 
 
 
 (defn -main
   [& args]
 
-  (let [fut1 (future (parse-abc "rtx 3060"))
-        fut2 (future (parse-abc "rtx 2060 super"))
-        fut3 (future (parse-e-katalog "rtx 3060"))
-        fut4 (future (parse-e-katalog "rtx 2060 super"))
-        fut5 (future (parse-e-katalog "gtx 1660 super"))
-        fut6 (future (parse-cu))]
+  (let [fut10 (future (parse-abc "rtx 3060"))
+        fut20 (future (parse-abc "rtx 2060 super"))
+        ;; fut21 (future (parse-abc "gtx 1660 super"))
 
-    (present "ABC RTX 3060" @fut1)
+        fut30 (future (parse-e-katalog "rtx 3060"))
+        fut40 (future (parse-e-katalog "rtx 2060 super"))
+        ;; fut50 (future (parse-e-katalog "gtx 1660 super"))
 
-    (present "ABC RTX 2060 Super" @fut2)
+        fut60 (future (parse-cu))
 
-    (present "E-Katalog RTX 3060" @fut3)
+        fut70 (future (parse-online-trade "rtx 3060"))
+        fut75 (future (parse-online-trade "rtx 2060 super"))]
 
-    (present "E-Katalog RTX 2060 Super" @fut4)
+    (present "ABC RTX 3060" @fut10)
 
-    (present "E-Katalog GTX 1660 Super" @fut5)
+    (present "ABC RTX 2060 Super" @fut20)
 
-    (present "Computer Universe" @fut6))
+    ;; (present "ABC GTX 1660 Super" @fut21)
+
+    (present "E-Katalog RTX 3060" @fut30)
+
+    (present "E-Katalog RTX 2060 Super" @fut40)
+
+    (present "OnlineTrade RTX 3060" @fut70)
+    (present "OnlineTrade RTX 2060 Super" @fut75)
+
+    ;; (present "E-Katalog GTX 1660 Super" @fut50)
+
+    (present "Computer Universe" @fut60))
 
   (System/exit 0))
