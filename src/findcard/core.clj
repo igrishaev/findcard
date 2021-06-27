@@ -324,8 +324,8 @@
         fut20 (future (parse-abc "rtx 2060 super"))
         ;; fut21 (future (parse-abc "gtx 1660 super"))
 
-        fut30 (future (parse-e-katalog "https://www.e-katalog.ru/ek-list.php?katalog_=189&presets_=43493&brands_=50,240,3902&order_=price"))
-        fut40 (future (parse-e-katalog "https://www.e-katalog.ru/ek-list.php?katalog_=189&presets_=35663,37775&brands_=50,240,3902&order_=price"))
+        fut30 (future (parse-e-katalog "https://www.e-katalog.ru/ek-list.php?brands_=50%2C240%2C3902%2C46%2C190&presets_=43493&katalog_=189&pf_=1&order_=price&save_podbor_=1"))
+        fut40 (future (parse-e-katalog "https://www.e-katalog.ru/ek-list.php?brands_=50%2C240%2C3902%2C46&presets_=35663%2C37775&katalog_=189&pf_=1&order_=price&save_podbor_=1"))
         ;; fut50 (future (parse-e-katalog "gtx 1660 super"))
 
         fut60 (future (parse-cu))
