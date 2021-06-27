@@ -115,7 +115,7 @@
       (for [[title price href] (map vector titles prices hrefs)]
 
         {:title title
-         :min-price (parse-price price)
+         :price (parse-price price)
          :url (str "https://www.computeruniverse.net" href)}))))
 
 
@@ -128,12 +128,26 @@
 
 (defn parse-e-katalog [url]
 
-  (let [document
+  (let [html
+
+        #_
+        (e/with-chrome
+
+          {:size [1920 1080]
+           :headless true
+           :user-agent "Mozilla: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101"}
+
+          driver
+
+          (e/go driver url)
+          (e/wait 1)
+          (e/get-source driver))
+
         (:body
          (client/get url))
 
         parsed-doc
-        (h/parse document)
+        (h/parse html)
 
         doc-tree
         (h/as-hickory parsed-doc)
@@ -141,40 +155,53 @@
         nodes
         (s/select (s/class "model-short-block") doc-tree)
 
-        report
-        (for [node nodes]
+        _
+        (spit "e-katalog.html" html)
 
-          (let [vcard
-                (s/select (s/class "model-short-title") node)
+        _
+        (def e-nodes nodes)]
 
-                title
-                (some-> vcard first :attrs :title)
+    (for [node nodes]
 
-                link
-                (s/select (s/attr "data-url") node)
+      (let [vcard
+            (s/select (s/class "model-short-title") node)
 
-                url
-                (str "https://www.e-katalog.ru"
-                     (some-> link first :attrs :data-url))
+            title
+            (some-> vcard first :attrs :title)
 
-                range-node
-                (s/select (s/class "model-price-range") node)
+            link
+            (s/select (s/attr "data-url") node)
 
-                min-price
-                (some-> range-node first :content second :content (nth 0) :content first
-                        parse-price)
+            id
+            (some-> (s/select (s/attr "data-idgood") node)
+                    first
+                    :attrs
+                    :data-idgood)
 
-                max-price
-                (some-> range-node first :content second :content (nth 2) :content first
-                        parse-price)]
+            price
+            (or
 
-            {:title title
-             :url url
-             :min-price min-price
-             :max-price max-price}))]
+             (some-> (s/select (s/id (format "price_%s" id)) node)
+                     first
+                     :content
+                     first
+                     parse-price)
 
-    (->> report
-         (filter (every-pred :min-price :max-price)))))
+             (some-> (s/select (s/class "pr31") node)
+                       first
+                       :content
+                       first
+                       :content
+                       first
+                       parse-price))
+
+            url
+            (str "https://www.e-katalog.ru"
+                 (some-> link first :attrs :data-url))]
+
+        {:title title
+         :url url
+         :price price}))))
 
 
 
@@ -222,7 +249,7 @@
 
         {:title title
          :url url
-         :min-price price}))))
+         :price price}))))
 
 
 (defn parse-online-trade [query]
@@ -285,7 +312,7 @@
                       parse-price)]
 
           {:title title
-           :min-price price
+           :price price
            :url url})))))
 
 
@@ -296,24 +323,20 @@
 
   (with-out-str
 
-    (doseq [{:keys [title url min-price max-price]} data]
+    (doseq [{:keys [title url price]} data
+            :when title]
 
       (println)
       (println title)
       (println url)
-      (print min-price)
-
-      (when max-price
-        (print " -- " max-price))
-
-      (println))))
+      (println price))))
 
 
 (defn present [title rows]
   (println)
   (println title)
   (println "-------------------")
-  (println (render (sort-by :min-price rows))))
+  (println (render (sort-by :price rows))))
 
 
 
