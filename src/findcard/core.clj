@@ -47,6 +47,9 @@
   (s/select (s/class "model-price-range") (first nodes)))
 
 
+(def window-size [800 600])
+
+
 (defn parse-price [line]
   (some-> line
           (str/replace #"[^0-9]" "")
@@ -57,7 +60,7 @@
 
   (e/with-chrome
 
-    {:size [1920 1080]
+    {:size window-size
      :headless true
      :user-agent "Mozilla: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101"}
 
@@ -133,7 +136,7 @@
         #_
         (e/with-chrome
 
-          {:size [1920 1080]
+          {:size window-size
            :headless true
            :user-agent "Mozilla: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101"}
 
@@ -256,7 +259,7 @@
 
   (e/with-chrome
 
-    {:size [1920 1080]
+    {:size window-size
      ;; :headless true
      ;; :user-agent "Mozilla: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101"
      }
