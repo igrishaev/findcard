@@ -66,7 +66,8 @@
 
     driver
 
-    (e/go driver "https://www.computeruniverse.net/ru/c/apparatnoe-obespechenie-i-komponenty/videokarty-pci-express?refinementList%5Bfacets.Chipsatz.values%5D%5B0%5D=NVIDIA%C2%AE%20GeForce%20RTX%E2%84%A2%203060&refinementList%5Bfacets.Chipsatz.values%5D%5B1%5D=NVIDIA%C2%AE%20GeForce%20RTX%E2%84%A2%202060&refinementList%5Bfacets.Chipsatz.values%5D%5B2%5D=NVIDIA%C2%AE%20GeForce%20RTX%E2%84%A2%203070&refinementList%5Bfacets.Chipsatz.values%5D%5B3%5D=NVIDIA%C2%AE%20GeForce%20RTX%E2%84%A2%203070%20Ti&range%5Bprice_ag_floored%5D%5Bmin%5D=431&toggle%5Bdeliverydatenow%5D=true&sortBy=Prod-ComputerUniverse_ru_price_asc")
+    ;; "https://www.computeruniverse.net/ru/c/apparatnoe-obespechenie-i-komponenty/videokarty-pci-express?refinementList%5Bfacets.Chipsatz.values%5D%5B0%5D=NVIDIA%C2%AE%20GeForce%20RTX%E2%84%A2%203060&refinementList%5Bfacets.Chipsatz.values%5D%5B1%5D=NVIDIA%C2%AE%20GeForce%20RTX%E2%84%A2%202060&refinementList%5Bfacets.Chipsatz.values%5D%5B2%5D=NVIDIA%C2%AE%20GeForce%20RTX%E2%84%A2%203070&refinementList%5Bfacets.Chipsatz.values%5D%5B3%5D=NVIDIA%C2%AE%20GeForce%20RTX%E2%84%A2%203070%20Ti&range%5Bprice_ag_floored%5D%5Bmin%5D=431&toggle%5Bdeliverydatenow%5D=true&sortBy=Prod-ComputerUniverse_ru_price_asc"
+    (e/go driver "https://www.computeruniverse.net/ru/c/apparatnoe-obespechenie-i-komponenty/videokarty-pci-express?refinementList%5Bfacets.Chipsatz.values%5D%5B0%5D=NVIDIA%C2%AE%20GeForce%20RTX%E2%84%A2%203090&refinementList%5Bfacets.Chipsatz.values%5D%5B1%5D=NVIDIA%C2%AE%20GeForce%20RTX%E2%84%A2%203080&refinementList%5Bfacets.Chipsatz.values%5D%5B2%5D=NVIDIA%C2%AE%20GeForce%20RTX%E2%84%A2%203070&toggle%5Bdeliverydatenow%5D=true&sortBy=Prod-ComputerUniverse_ru_price_asc")
 
     (e/wait 1)
 
@@ -346,34 +347,35 @@
 (defn -main
   [& args]
 
-  (let [fut10 (future (parse-abc "rtx 3060"))
-        fut20 (future (parse-abc "rtx 2060 super"))
+  (let [;; fut10 (future (parse-abc "rtx 3060"))
+        ;; fut20 (future (parse-abc "rtx 2060 super"))
         ;; fut21 (future (parse-abc "gtx 1660 super"))
 
         ;; 70k
-        fut30 (future (parse-e-katalog "https://www.e-katalog.ru/ek-list.php?brands_=46%2C50%2C190%2C240%2C3902&presets_=43493&katalog_=189&pf_=1&maxPrice_=70000&order_=price&save_podbor_=1"))
+        ;; fut30 (future (parse-e-katalog "https://www.e-katalog.ru/ek-list.php?brands_=46%2C50%2C190%2C240%2C3902&presets_=43493&katalog_=189&pf_=1&maxPrice_=70000&order_=price&save_podbor_=1"))
 
         ;; 60k
-        fut40 (future (parse-e-katalog "https://www.e-katalog.ru/ek-list.php?brands_=46%2C50%2C240%2C3902&presets_=35663%2C37775&katalog_=189&pf_=1&maxPrice_=60000&order_=price&save_podbor_=1"))
+        ;; fut40 (future (parse-e-katalog "https://www.e-katalog.ru/ek-list.php?brands_=46%2C50%2C240%2C3902&presets_=35663%2C37775&katalog_=189&pf_=1&maxPrice_=60000&order_=price&save_podbor_=1"))
         ;; fut50 (future (parse-e-katalog "gtx 1660 super"))
 
         fut60 (future (parse-cu))
 
-        fut70 (future (parse-online-trade "rtx+3060"))
-        fut75 (future (parse-online-trade "rtx+2060+super"))]
+        ;; fut70 (future (parse-online-trade "rtx+3060"))
+        ;; fut75 (future (parse-online-trade "rtx+2060+super"))
+        ]
 
-    (present "ABC RTX 3060" @fut10)
+    ;; (present "ABC RTX 3060" @fut10)
 
-    (present "ABC RTX 2060 Super" @fut20)
+    ;; (present "ABC RTX 2060 Super" @fut20)
 
     ;; (present "ABC GTX 1660 Super" @fut21)
 
-    (present "E-Katalog RTX 3060" @fut30)
+    ;; (present "E-Katalog RTX 3060" @fut30)
 
-    (present "E-Katalog RTX 2060 (Super)" @fut40)
+    ;; (present "E-Katalog RTX 2060 (Super)" @fut40)
 
-    (present "OnlineTrade RTX 3060" @fut70)
-    (present "OnlineTrade RTX 2060 Super" @fut75)
+    ;; (present "OnlineTrade RTX 3060" @fut70)
+    ;; (present "OnlineTrade RTX 2060 Super" @fut75)
 
     ;; (present "E-Katalog GTX 1660 Super" @fut50)
 
